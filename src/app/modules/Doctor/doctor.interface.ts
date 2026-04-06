@@ -1,3 +1,7 @@
-export type TDoctor = {
-    // Add interface properties here
-    };
+export interface IUpdateDoctorPayload {
+  name?: string;
+  profilePhoto?: string;
+  contactNumber?: string;
+  address?: string;
+  experiance?: number;
+}
