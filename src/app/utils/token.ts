@@ -1,7 +1,7 @@
 import { JwtPayload, SignOptions } from "jsonwebtoken";
 import { jwtUtils } from "./jwt";
 import { envVars } from "../config/env";
-import ms from "ms";
+import ms, { StringValue } from "ms";
 import { cookieUtils } from "./cookie";
 import { Response } from "express";
 const getAccessToken = (payload: JwtPayload) => {
@@ -22,33 +22,32 @@ const getRefreshToken = (payload: JwtPayload) => {
 };
 
 const setAccessTokenCookie = (res: Response, token: string) => {
-  const maxAge = ms(Number(envVars.ACCESS_TOKEN_EXPIRATION));
   cookieUtils.setCookie(res, "accessToken", token, {
     httpOnly: true,
     secure: true,
     sameSite: "none",
     path: "/",
-    maxAge: Number(maxAge),
+    // 1 day
+    maxAge: 60 * 60 * 60 * 24,
   });
 };
 const setRefreshTokenCookie = (res: Response, token: string) => {
-  const maxAge = ms(Number(envVars.ACCESS_TOKEN_EXPIRATION));
-  cookieUtils.setCookie(res, "accessToken", token, {
+  cookieUtils.setCookie(res, "refreshToken", token, {
     httpOnly: true,
     secure: true,
     sameSite: "none",
     path: "/",
-    maxAge: Number(maxAge),
+    // 1 day
+    maxAge: 60 * 60 * 60 * 24,
   });
 };
 const setBetterAuthSessionCookie = (res: Response, token: string) => {
-  const maxAge = ms(Number(envVars.ACCESS_TOKEN_EXPIRATION));
   cookieUtils.setCookie(res, "better-auth.session_token", token, {
     httpOnly: true,
     secure: true,
     sameSite: "none",
     path: "/",
-    maxAge: Number(maxAge),
+    maxAge: 60 * 60 * 60 * 24,
   });
 };
 

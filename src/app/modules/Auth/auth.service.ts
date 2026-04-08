@@ -3,8 +3,6 @@ import { UserStatus } from "../../../generated/prisma";
 import AppError from "../../errorHelpers/AppError";
 import { auth } from "../../lib/auth";
 import { prisma } from "../../lib/prisma";
-import e from "express";
-import { da, is } from "zod/v4/locales";
 import { tokenUtils } from "../../utils/token";
 
 interface IRegisterPayload {
@@ -73,7 +71,12 @@ const registerPatient = async (payload: IRegisterPayload) => {
       throw error;
     }
   } catch (error: any) {
-    throw new AppError(status.BAD_REQUEST, "Registration failed");
+    console.log(error);
+
+    throw new AppError(
+      status.BAD_REQUEST,
+      error.message || "Registration failed"
+    );
   }
 };
 
