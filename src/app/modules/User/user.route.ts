@@ -1,18 +1,30 @@
-import express, { NextFunction, Request, Response } from "express";
+import express from "express";
 import { UserController } from "./user.controller";
-import z from "zod";
-import { Gender } from "../../../generated/prisma";
 import { validateRequest } from "../../middlewares/validateRequest";
-import { createDoctorZodSchema } from "./user.validation";
+import {
+  createAdminValidationSchema,
+  createDoctorValidation,
+  createSuperAdminValidationSchema,
+} from "./user.validation";
 
 const router = express.Router();
 
 router.post(
   "/create-doctor",
-  validateRequest(createDoctorZodSchema),
+  validateRequest(createDoctorValidation),
   UserController.createDoctor
 );
-// router.post("/create-admin", UserController.createDoctor);
-// router.post("/create-superadmin", UserController.createDoctor);
+
+router.post(
+  "/create-admin",
+  validateRequest(createAdminValidationSchema),
+  UserController.createAdmin
+);
+
+router.post(
+  "/create-superadmin",
+  validateRequest(createSuperAdminValidationSchema),
+  UserController.createSuperAdmin
+);
 
 export const UserRoutes = router;

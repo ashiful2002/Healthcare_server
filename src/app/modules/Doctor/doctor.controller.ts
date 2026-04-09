@@ -19,7 +19,7 @@ const getDoctorById = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     httpStatusCode: status.OK,
     success: true,
-    message: "Successfully Get Doctor by Id ",
+    message: "Successfully Get Specific Doctor ",
     data: result,
   });
 });
@@ -34,6 +34,7 @@ const updateDoctor = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+
 const deleteDoctor = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
 

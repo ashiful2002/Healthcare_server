@@ -1,0 +1,55 @@
+import { Request, Response } from "express";
+import status from "http-status";
+import { catchAsync } from "../../shared/catchAsync";
+import { sendResponse } from "../../shared/sendResponse";
+import { AdminService } from "./admin.service";
+
+const getAllAdmins = catchAsync(async (req: Request, res: Response) => {
+  const result = await AdminService.getAllAdmins();
+  sendResponse(res, {
+    httpStatusCode: status.OK,
+    success: true,
+    message: "Admins retrieved successfully",
+    data: result,
+  });
+});
+
+const getAdminById = catchAsync(async (req: Request, res: Response) => {
+  const result = await AdminService.getAdminById(req.params.id as string);
+  sendResponse(res, {
+    httpStatusCode: status.OK,
+    success: true,
+    message: "Admin retrieved successfully",
+    data: result,
+  });
+});
+
+const updateAdmin = catchAsync(async (req: Request, res: Response) => {
+  const result = await AdminService.updateAdmin(
+    req.params.id as string,
+    req.body
+  );
+  sendResponse(res, {
+    httpStatusCode: status.OK,
+    success: true,
+    message: "Admin updated successfully",
+    data: result,
+  });
+});
+
+const deleteAdmin = catchAsync(async (req: Request, res: Response) => {
+  const result = await AdminService.deleteAdmin(req.params.id as string);
+  sendResponse(res, {
+    httpStatusCode: status.OK,
+    success: true,
+    message: "Admin deleted successfully",
+    data: result,
+  });
+});
+
+export const AdminController = {
+  getAllAdmins,
+  getAdminById,
+  updateAdmin,
+  deleteAdmin,
+};

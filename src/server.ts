@@ -1,5 +1,4 @@
 import app from "./app";
-import config from "./app/config";
 import { envVars } from "./app/config/env";
 
 async function main() {

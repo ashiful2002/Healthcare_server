@@ -18,3 +18,15 @@ export interface IcreateDoctorPayload {
   };
   specialities: string[];
 }
+export interface ICreateAdmin {
+  password: string;
+  admin: {
+    name: string;
+    email: string;
+    profilePhoto?: string;
+    contactNumber: string;
+  };
+}
+
+// Super admin uses the same payload shape
+export type ICreateSuperAdmin = ICreateAdmin;

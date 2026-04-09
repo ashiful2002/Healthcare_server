@@ -1,9 +1,21 @@
 import status from "http-status";
-import { Role, Specialty } from "../../../generated/prisma";
+import { Role } from "../../../generated/prisma";
 import AppError from "../../errorHelpers/AppError";
 import { auth } from "../../lib/auth";
 import { prisma } from "../../lib/prisma";
-import { IcreateDoctorPayload } from "./user.interface";
+import {
+  IcreateDoctorPayload,
+  ICreateAdmin,
+  ICreateSuperAdmin,
+} from "./user.interface";
+import { Specialty } from "../../../generated/prisma";
+
+// ─── helpers ────────────────────────────────────────────────────────────────
+
+const assertEmailFree = async (email: string) => {
+  const exists = await prisma.user.findUnique({ where: { email } });
+  if (exists) throw new AppError(status.CONFLICT, "User already exists");
+};
 
 const createDoctor = async (payload: IcreateDoctorPayload) => {
   const specialities: Specialty[] = [];
@@ -29,9 +41,9 @@ const createDoctor = async (payload: IcreateDoctorPayload) => {
     },
   });
   if (userExists) {
-    // throw new Error("User with this email already exists");
     throw new AppError(status.CONFLICT, "User Already exists");
   }
+
   const userData = await auth.api.signUpEmail({
     body: {
       email: payload.doctor.email,
@@ -51,12 +63,11 @@ const createDoctor = async (payload: IcreateDoctorPayload) => {
         },
       });
 
-      const doctorSpecialityData = specialities.map((specialty) => {
-        return {
-          doctorId: doctorData.id,
-          specialtyId: specialty.id,
-        };
-      });
+      const doctorSpecialityData = specialities.map((specialty) => ({
+        doctorId: doctorData.id,
+        specialtyId: specialty.id,
+      }));
+
       await tx.doctorSpeciality.createMany({
         data: doctorSpecialityData,
       });
@@ -106,12 +117,115 @@ const createDoctor = async (payload: IcreateDoctorPayload) => {
           },
         },
       });
+
       return doctor;
     });
+
     return result;
-  } catch (error) {}
+  } catch (error) {
+    throw error;
+  }
+};
+
+
+const createAdmin = async (payload: ICreateAdmin) => {
+  await assertEmailFree(payload.admin.email);
+
+  const userData = await auth.api.signUpEmail({
+    body: {
+      email: payload.admin.email,
+      password: payload.password,
+      role: Role.ADMIN,
+      name: payload.admin.name,
+      needPasswordChange: true,
+    },
+  });
+
+  const admin = await prisma.admin.create({
+    data: {
+      userId: userData.user.id,
+      ...payload.admin,
+    },
+    select: {
+      id: true,
+      userId: true,
+      name: true,
+      email: true,
+      profilePhoto: true,
+      contactNumber: true,
+      createdAt: true,
+      updatedAt: true,
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          status: true,
+          emailVerified: true,
+          image: true,
+          isDeleted: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      },
+    },
+  });
+
+  return admin;
+};
+
+// ─── createSuperAdmin ────────────────────────────────────────────────────────
+
+const createSuperAdmin = async (payload: ICreateSuperAdmin) => {
+  await assertEmailFree(payload.admin.email);
+
+  const userData = await auth.api.signUpEmail({
+    body: {
+      email: payload.admin.email,
+      password: payload.password,
+      role: Role.SUPER_ADMIN,
+      name: payload.admin.name,
+      needPasswordChange: true,
+    },
+  });
+
+  const superAdmin = await prisma.admin.create({
+    data: {
+      userId: userData.user.id,
+      ...payload.admin,
+    },
+    select: {
+      id: true,
+      userId: true,
+      name: true,
+      email: true,
+      profilePhoto: true,
+      contactNumber: true,
+      createdAt: true,
+      updatedAt: true,
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          status: true,
+          emailVerified: true,
+          image: true,
+          isDeleted: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      },
+    },
+  });
+
+  return superAdmin;
 };
 
 export const UserService = {
   createDoctor,
+  createAdmin,
+  createSuperAdmin,
 };
