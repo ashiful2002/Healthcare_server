@@ -3,6 +3,7 @@ import { prisma } from "../../lib/prisma";
 import { IUpdateDoctorPayload } from "./doctor.interface";
 import AppError from "../../errorHelpers/AppError";
 import status from "http-status";
+import { UserStatus } from "../../../generated/prisma";
 
 const getAllDoctors = async () => {
   const doctors = await prisma.doctor.findMany({
@@ -40,7 +41,7 @@ const updateDoctor = async (
   id: string,
   payload: Partial<IUpdateDoctorPayload>
 ) => {
-  const existDoctor = await prisma.doctor.findUniqueOrThrow({
+  const existDoctor = await prisma.doctor.findUnique({
     where: {
       id,
       isDeleted: false,
@@ -71,26 +72,49 @@ const deleteDoctor = async (id: string) => {
     where: {
       id,
     },
+    include: {
+      user: true,
+    },
   });
   if (!existDoctor) {
     throw new AppError(status.NOT_FOUND, "Doctor Not Found");
   }
-  if (existDoctor.isDeleted) {
-    throw new AppError(status.BAD_REQUEST, "Doctor is already deleted");
-  }
 
-  // make doctor as deleted
-  const deleted = await prisma.doctor.update({
-    where: {
-      id,
-    },
-    data: {
-      isDeleted: true,
-      DeletedAt: new Date(),
-    },
+  await prisma.$transaction(async (tx) => {
+    await tx.doctor.update({
+      where: {
+        id,
+      },
+      data: {
+        isDeleted: true,
+        DeletedAt: new Date(),
+      },
+    });
+
+    await tx.user.update({
+      where: {
+        id: existDoctor.userId,
+      },
+      data: {
+        isDeleted: true,
+        deletedAt: new Date(),
+        status: UserStatus.DELETED,
+      },
+    });
+    await tx.session.deleteMany({
+      where: {
+        userId: existDoctor.userId,
+      },
+    });
+    await tx.doctorSchedules.deleteMany({
+      where: {
+        doctorId: id,
+      },
+    });
   });
-
-  return { deleted };
+  return {
+    message: "Doctor deleted successfully",
+  };
 };
 
 export const DoctorService = {

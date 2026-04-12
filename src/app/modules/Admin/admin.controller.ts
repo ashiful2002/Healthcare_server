@@ -38,7 +38,8 @@ const updateAdmin = catchAsync(async (req: Request, res: Response) => {
 });
 
 const deleteAdmin = catchAsync(async (req: Request, res: Response) => {
-  const result = await AdminService.deleteAdmin(req.params.id as string);
+  const user = req.user;
+  const result = await AdminService.deleteAdmin(req.params.id as string, user);
   sendResponse(res, {
     httpStatusCode: status.OK,
     success: true,

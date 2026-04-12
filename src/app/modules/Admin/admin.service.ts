@@ -2,6 +2,7 @@ import status from "http-status";
 import AppError from "../../errorHelpers/AppError";
 import { prisma } from "../../lib/prisma";
 import { IAdminUpdate } from "./admin.interface";
+import { IRequestUser } from "../../interfaces/requestUser.interface";
 
 const adminSelect = {
   id: true,
@@ -68,15 +69,17 @@ const updateAdmin = async (id: string, payload: IAdminUpdate) => {
   return result;
 };
 
-const deleteAdmin = async (id: string) => {
-  const admin = await prisma.admin.findUnique({
+const deleteAdmin = async (id: string, user: IRequestUser) => {
+  const isAdminExist = await prisma.admin.findUnique({
     where: { id, isDeleted: false },
   });
 
-  if (!admin) {
+  if (!isAdminExist) {
     throw new AppError(status.NOT_FOUND, "Admin not found");
   }
-
+  if (isAdminExist.id === user.userId) {
+    throw new AppError(status.BAD_REQUEST, "You cannot delete yourself");
+  }
   const result = await prisma.$transaction(async (tx) => {
     const deletedAdmin = await tx.admin.update({
       where: { id },
@@ -85,7 +88,7 @@ const deleteAdmin = async (id: string) => {
     });
 
     await tx.user.update({
-      where: { id: admin.userId },
+      where: { id: isAdminExist.userId },
       data: { isDeleted: true },
     });
 

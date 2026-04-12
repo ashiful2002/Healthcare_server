@@ -1,19 +1,30 @@
 import express from "express";
 import { DoctorController } from "./doctor.controller";
 import { checkAuth } from "../../middlewares/checkAuth";
+import { Role } from "../../../generated/prisma";
 
 const router = express.Router();
 
-router.get("/", DoctorController.getAllDoctors);
-router.get("/:id", DoctorController.getDoctorById);
+router.get(
+  "/",
+  checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
+  DoctorController.getAllDoctors
+);
+router.get(
+  "/:id",
+  checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
+  DoctorController.getDoctorById
+);
 router.patch(
   "/:id",
-  checkAuth("ADMIN", "SUPER_ADMIN"),
+  checkAuth(Role.SUPER_ADMIN),
+
   DoctorController.updateDoctor
 );
 router.delete(
   "/:id",
-  checkAuth("ADMIN", "SUPER_ADMIN"),
+  checkAuth(Role.SUPER_ADMIN),
+
   DoctorController.deleteDoctor
 );
 

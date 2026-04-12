@@ -69,8 +69,12 @@ export const checkAuth =
             "Forbidden access! You do not have permission to access this resource"
           );
         }
-
-        return next(); // ✅ Short-circuit — skip JWT path entirely
+        req.user = {
+          userId: user.id,
+          role: user.role,
+          email: user.email,
+        };
+        return next();
       }
 
       // --- Path 2: JWT access token auth (fallback) ---
