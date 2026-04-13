@@ -14,3 +14,8 @@ async function main() {
 }
 
 main();
+
+//  multer
+// npm i @types/multer
+
+// npm i multer-storage-cloudinary

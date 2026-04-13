@@ -4,7 +4,12 @@ import { catchAsync } from "../../shared/catchAsync";
 import { sendResponse } from "../../shared/sendResponse";
 
 const createSpecialty = catchAsync(async (req: Request, res: Response) => {
-  const payload = req.body;
+  const payload = {
+    ...req.body,
+    icon: req.file?.path,
+  };
+  console.log(payload);
+
   const result = await SpecialityService.createSpecialist(payload);
   sendResponse(res, {
     httpStatusCode: 201,
