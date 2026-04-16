@@ -3,27 +3,67 @@ import { prisma } from "../../lib/prisma";
 import { IUpdateDoctorPayload } from "./doctor.interface";
 import AppError from "../../errorHelpers/AppError";
 import status from "http-status";
-import { UserStatus } from "../../../generated/prisma";
+import { Doctor, Prisma, UserStatus } from "../../../generated/prisma";
+import { QueryBuilder } from "../../utils/QueryBuilder";
+import {
+  doctorFilterableFields,
+  doctorIncludeConfig,
+  doctorSearchableFields,
+} from "./doctor.constant";
+import { IQueryParams } from "../../interfaces/query.interface";
+import { tupleProcessor } from "zod/v4/core/json-schema-processors.cjs";
 
-const getAllDoctors = async () => {
-  const doctors = await prisma.doctor.findMany({
-    where: {
-      isDeleted: false,
-    },
-    include: {
-      user: true,
-      specialities: {
-        include: {
-          specialty: true,
-        },
-      },
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
+const getAllDoctors = async (query: IQueryParams) => {
+  // const doctors = await prisma.doctor.findMany({
+  //   where: {
+  //     isDeleted: false,
+  //   },
+  //   include: {
+  //     user: true,
+  //     specialities: {
+  //       include: {
+  //         specialty: true,
+  //       },
+  //     },
+  //   },
+  //   orderBy: {
+  //     createdAt: "desc",
+  //   },
+  // });
+
+  // return doctors;
+
+  const queryBuilder = new QueryBuilder<
+    Doctor,
+    Prisma.DoctorWhereInput,
+    Prisma.DoctorInclude
+  >(prisma.doctor, query, {
+    searchableFields: doctorSearchableFields,
+    filterableFields: doctorFilterableFields,
   });
 
-  return doctors;
+  const result = await queryBuilder
+    .search()
+    .filter()
+    .where({
+      isDeleted: false,
+    })
+    .include({
+      user: true,
+      specialities: true,
+      // specialities: {
+      //   include: {
+      //     specialty: true,
+      //   },
+      // },
+    })
+    .dynamicInclude(doctorIncludeConfig)
+    .paginate()
+    .sort()
+    .fields()
+    .execute();
+
+  return result;
 };
 
 const getDoctorById = async (id: string) => {
