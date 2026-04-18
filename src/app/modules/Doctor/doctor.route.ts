@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.get(
   "/",
-  checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
+  // checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
   DoctorController.getAllDoctors
 );
 router.get(
