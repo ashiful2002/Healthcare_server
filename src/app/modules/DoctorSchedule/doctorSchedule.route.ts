@@ -1,14 +1,21 @@
-import express from 'express';
+import { Router } from 'express';
 import { DoctorScheduleController } from './doctorSchedule.controller';
 import { checkAuth } from '../../middlewares/checkAuth';
 import { Role } from '../../../generated/prisma';
 
-const router = express.Router();
+const router = Router();
 
-router.get('/', DoctorScheduleController.getAllDoctorSchedules);
-router.get('/:id', DoctorScheduleController.getDoctorScheduleById);
-router.post('/', checkAuth(Role.ADMIN, Role.SUPER_ADMIN), DoctorScheduleController.createDoctorSchedule);
-router.patch('/:id', checkAuth(Role.ADMIN, Role.SUPER_ADMIN), DoctorScheduleController.updateDoctorSchedule);
-router.delete('/:id', checkAuth(Role.ADMIN, Role.SUPER_ADMIN), DoctorScheduleController.deleteDoctorSchedule);
+
+
+router.post("/create-my-doctor-schedule",
+    checkAuth(Role.DOCTOR),
+    DoctorScheduleController.createMyDoctorSchedule);
+router.get("/my-doctor-schedules", checkAuth(Role.DOCTOR), DoctorScheduleController.getMyDoctorSchedules);
+router.get("/", checkAuth(Role.ADMIN, Role.SUPER_ADMIN), DoctorScheduleController.getAllDoctorSchedules);
+router.get("/:doctorId/schedule/:scheduleId", checkAuth(Role.ADMIN, Role.SUPER_ADMIN), DoctorScheduleController.getDoctorScheduleById);
+router.patch("/update-my-doctor-schedule",
+    checkAuth(Role.DOCTOR),
+    DoctorScheduleController.updateMyDoctorSchedule);
+router.delete("/delete-my-doctor-schedule/:id", checkAuth(Role.DOCTOR), DoctorScheduleController.deleteMyDoctorSchedule);
 
 export const DoctorScheduleRoutes = router;

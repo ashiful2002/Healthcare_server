@@ -1,3 +1,10 @@
-export type TDoctorSchedule = {
-    // Add interface properties here
-    };
+export interface ICreateDoctorSchedulePayload {
+    scheduleIds : string[];
+}
+
+export interface IUpdateDoctorSchedulePayload {
+    scheduleIds :{
+        shouldDelete : boolean;
+        id : string;
+    }[]
+}

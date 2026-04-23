@@ -1,14 +1,17 @@
-import express from 'express';
-import { AppointmentController } from './appointment.controller';
-import { checkAuth } from '../../middlewares/checkAuth';
-import { Role } from '../../../generated/prisma';
+import { Router } from "express";
 
-const router = express.Router();
+import { AppointmentController } from "./appointment.controller";
+import { checkAuth } from "../../middlewares/checkAuth";
+import { Role } from "../../../generated/prisma";
 
-router.get('/', checkAuth(Role.ADMIN, Role.SUPER_ADMIN), AppointmentController.getAllAppointments);
-router.get('/:id', checkAuth(Role.ADMIN, Role.SUPER_ADMIN), AppointmentController.getAppointmentById);
-router.post('/', checkAuth(Role.PATIENT), AppointmentController.createAppointment);
-router.patch('/:id', checkAuth(Role.ADMIN, Role.SUPER_ADMIN), AppointmentController.updateAppointment);
-router.delete('/:id', checkAuth(Role.ADMIN, Role.SUPER_ADMIN), AppointmentController.deleteAppointment);
+const router = Router();
+
+router.post("/book-appointment", checkAuth(Role.PATIENT), AppointmentController.bookAppointment);
+router.get("/my-appointments", checkAuth(Role.PATIENT, Role.DOCTOR), AppointmentController.getMyAppointments);
+router.patch("/change-appointment-status/:id", checkAuth(Role.PATIENT, Role.DOCTOR, Role.ADMIN, Role.SUPER_ADMIN), AppointmentController.changeAppointmentStatus);
+router.get("/my-single-appointment/:id", checkAuth(Role.PATIENT, Role.DOCTOR), AppointmentController.getMySingleAppointment);
+router.get("/all-appointments", checkAuth(Role.ADMIN, Role.SUPER_ADMIN), AppointmentController.getAllAppointments);
+router.post("/book-appointment-with-pay-later", checkAuth(Role.PATIENT), AppointmentController.bookAppointmentWithPayLater);
+router.post("/initiate-payment/:id", checkAuth(Role.PATIENT), AppointmentController.initiatePayment);
 
 export const AppointmentRoutes = router;

@@ -15,7 +15,7 @@
     "studio": "prisma studio",
     "push": "prisma db push",
     "pull": "prisma db pull",
-    "stripe:webhook": "stripe listen --forward-to localhost:5000/webhook",
+    "stripe:webhook": "stripe listen --forward-to localhost:5001/api/v1/webhook",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -45,6 +45,8 @@
     "nodemailer": "^8.0.5",
     "pg": "^8.20.0",
     "qs": "^6.15.1",
+    "stripe": "^22.0.2",
+    "uuid": "^14.0.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {
