@@ -53,6 +53,9 @@ importers:
       multer-storage-cloudinary:
         specifier: ^4.0.0
         version: 4.0.0(cloudinary@2.9.0)
+      node-cron:
+        specifier: ^4.2.1
+        version: 4.2.1
       nodemailer:
         specifier: ^8.0.5
         version: 8.0.5
@@ -63,8 +66,8 @@ importers:
         specifier: ^6.15.1
         version: 6.15.1
       stripe:
-        specifier: ^22.0.2
-        version: 22.0.2(@types/node@25.5.2)
+        specifier: ^22.1.0
+        version: 22.1.0(@types/node@25.5.2)
       uuid:
         specifier: ^14.0.0
         version: 14.0.0
@@ -1273,6 +1276,10 @@ packages:
     resolution: {integrity: sha512-9MdFxmkKaOYVTV+XVRG8ArDwwQ77XIgIPyKASB1k3JPq3M8fGQQQE3YpMOrKm6g//Ktx8ivZr8xo1Qmtqub+GA==}
     engines: {node: ^18 || ^20 || >= 21}
 
+  node-cron@4.2.1:
+    resolution: {integrity: sha512-lgimEHPE/QDgFlywTd8yTR61ptugX3Qer29efeyWw2rv259HtGBNn1vZVmp8lB9uo9wC0t/AT4iGqXxia+CJFg==}
+    engines: {node: '>=6.0.0'}
+
   node-fetch-native@1.6.7:
     resolution: {integrity: sha512-g9yhqoedzIUm0nTnTqAQvueMPVOuIY16bqgAJJC8XOOubYFNwz6IER9qs0Gq2Xd0+CecCKFjtdDTMA4u4xG06Q==}
 
@@ -1621,8 +1628,8 @@ packages:
     resolution: {integrity: sha512-4gB8na07fecVVkOI6Rs4e7T6NOTki5EmL7TUduTs6bu3EdnSycntVJ4re8kgZA+wx9IueI2Y11bfbgwtzuE0KQ==}
     engines: {node: '>=0.10.0'}
 
-  stripe@22.0.2:
-    resolution: {integrity: sha512-2/BLrQ3oB1zlNfeL/LfHFjTGx6EQn0j+ztrrTJHuDjV5VVIpk92oSDaxyKLUr3pG3dnee2LZqhFUv2Bf0G1/3g==}
+  stripe@22.1.0:
+    resolution: {integrity: sha512-w/xHyJGxXWnLPbNHG13sz/fae0MrFGC80Oz7YbICQymbfpqfEcsoG+6yG+9BWb81PWc4rrkeSO4wmTcmefmbLw==}
     engines: {node: '>=18'}
     peerDependencies:
       '@types/node': '>=18'
@@ -2872,6 +2879,8 @@ snapshots:
 
   node-addon-api@8.7.0: {}
 
+  node-cron@4.2.1: {}
+
   node-fetch-native@1.6.7: {}
 
   node-gyp-build@4.8.4: {}
@@ -3197,7 +3206,7 @@ snapshots:
 
   strip-json-comments@2.0.1: {}
 
-  stripe@22.0.2(@types/node@25.5.2):
+  stripe@22.1.0(@types/node@25.5.2):
     optionalDependencies:
       '@types/node': 25.5.2
 

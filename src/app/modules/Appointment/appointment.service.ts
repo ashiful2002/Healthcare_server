@@ -1,13 +1,12 @@
 import status from "http-status";
-// import { uuidv7 } from "zod/mini";
 import { v7 as uuidv7 } from "uuid";
 import { envVars } from "../../config/env";
-// import { stripe } from "../../config/stripe.config";
 import AppError from "../../errorHelpers/AppError";
 import { IRequestUser } from "../../interfaces/requestUser.interface";
 import { prisma } from "../../lib/prisma";
 import { IBookAppointmentPayload } from "./appointment.interface";
 import { AppointmentStatus, PaymentStatus, Role } from "../../../generated/prisma";
+import { stripe } from "../../config/stripe";
 
 // Pay Now Book Appointment
 const bookAppointment = async (payload: IBookAppointmentPayload, user: IRequestUser) => {
@@ -75,37 +74,37 @@ const bookAppointment = async (payload: IBookAppointmentPayload, user: IRequestU
             }
         });
 
-        // const session = await stripe.checkout.sessions.create({
-        //     payment_method_types: ['card'],
-        //     mode: 'payment',
-        //     line_items :[
-        //         {
-        //             price_data:{
-        //                 currency:"bdt",
-        //                 product_data:{
-        //                     name : `Appointment with Dr. ${doctorData.name}`,
-        //                 },
-        //                 unit_amount : doctorData.appointmentFee * 100,
-        //             },
-        //             quantity : 1,
-        //         }
-        //     ],
-        //     metadata:{
-        //         appointmentId : appointmentData.id,
-        //         paymentId : paymentData.id,
-        //     },
+        const session = await stripe.checkout.sessions.create({
+            payment_method_types: ['card'],
+            mode: 'payment',
+            line_items: [
+                {
+                    price_data: {
+                        currency: "bdt",
+                        product_data: {
+                            name: `Appointment with Dr. ${doctorData.name}`,
+                        },
+                        unit_amount: doctorData.appointMentFee * 120,
+                    },
+                    quantity: 1,
+                }
+            ],
+            metadata: {
+                appointmentId: appointmentData.id,
+                paymentId: paymentData.id,
+            },
 
-        //     success_url: `${envVars.FRONTEND_URL}/dashboard/payment/payment-success`,
+            success_url: `${envVars.FRONTEND_URL}/dashboard/payment/payment-success`,
 
-        //     // cancel_url: `${envVars.FRONTEND_URL}/dashboard/payment/payment-failed`,
-        //     cancel_url: `${envVars.FRONTEND_URL}/dashboard/appointments`,
-        // })
+            // cancel_url: `${envVars.FRONTEND_URL}/dashboard/payment/payment-failed`,
+            cancel_url: `${envVars.FRONTEND_URL}/dashboard/appointments`,
+        })
 
-        // return {
-        //     appointmentData,
-        //     paymentData,
-        //     paymentUrl : session.url,
-        // };
+        return {
+            appointmentData,
+            paymentData,
+            paymentUrl: session.url,
+        };
     });
 
     // return {
@@ -273,6 +272,8 @@ const getAllAppointments = async () => {
 }
 
 
+
+// Pay Later Book Appointment
 const bookAppointmentWithPayLater = async (payload: IBookAppointmentPayload, user: IRequestUser) => {
     const patientData = await prisma.patient.findUniqueOrThrow({
         where: {
@@ -380,40 +381,41 @@ const initiatePayment = async (appointmentId: string, user: IRequestUser) => {
         throw new AppError(status.BAD_REQUEST, "Appointment is canceled");
     }
 
-    // const session = await stripe.checkout.sessions.create({
-    //     payment_method_types: ["card"],
-    //     mode: 'payment',
-    //     line_items: [
-    //         {
-    //             price_data: {
-    //                 currency: "bdt",
-    //                 product_data: {
-    //                     name: `Appointment with Dr. ${appointmentData.doctor.name}`,
-    //                 },
-    //                 unit_amount: appointmentData.doctor.appointmentFee * 100,
-    //             },
-    //             quantity: 1,
-    //         }
-    //     ],
-    //     metadata: {
-    //         appointmentId: appointmentData.id,
-    //         paymentId: appointmentData.payment.id,
-    //     },
+    const session = await stripe.checkout.sessions.create({
+        payment_method_types: ["card"],
+        mode: 'payment',
+        line_items: [
+            {
+                price_data: {
+                    currency: "bdt",
+                    product_data: {
+                        name: `Appointment with Dr. ${appointmentData.doctor.name}`,
+                    },
+                    unit_amount: appointmentData.doctor.appointMentFee * 100,
+                },
+                quantity: 1,
+            }
+        ],
+        metadata: {
+            appointmentId: appointmentData.id,
+            paymentId: appointmentData.payment.id,
+        },
 
-    //     success_url: `${envVars.FRONTEND_URL}/dashboard/payment/payment-success?appointment_id=${appointmentData.id}&payment_id=${appointmentData.payment.id}`,
 
-    //     // cancel_url: `${envVars.FRONTEND_URL}/dashboard/payment/payment-failed`,
-    //     cancel_url: `${envVars.FRONTEND_URL}/dashboard/appointments?error=payment_cancelled`,
-    // })
+        success_url: `${envVars.FRONTEND_URL}/dashboard/payment/payment-success?appointment_id=${appointmentData.id}&payment_id=${appointmentData.payment.id}`,
 
-    // return {
-    //     paymentUrl: session.url,
-    // }
+        // cancel_url: `${envVars.FRONTEND_URL}/dashboard/payment/payment-failed`,
+        cancel_url: `${envVars.FRONTEND_URL}/dashboard/appointments?error=payment_cancelled`,
+    })
+
+    return {
+        paymentUrl: session.url,
+    }
 }
 
 const cancelUnpaidAppointments = async () => {
-    const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
 
+    const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
     const unpaidAppointments = await prisma.appointment.findMany({
         where: {
             // status: AppointmentStatus.SCHEDULED,
