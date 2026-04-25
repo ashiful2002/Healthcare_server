@@ -86,6 +86,7 @@ const registerPatient = async (payload: IRegisterPatientPayload) => {
 
 const loginUser = async (payload: ILoginUserPayload) => {
   const { email, password } = payload;
+  console.log("payload", payload);
 
   const data = await auth.api.signInEmail({
     body: {
