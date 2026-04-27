@@ -4,7 +4,7 @@ import { seedSuperAdmin } from "./app/utils/seed";
 
 async function main() {
   try {
-    await seedSuperAdmin();
+    // await seedSuperAdmin();
     app.listen(envVars.PORT, () => {
       console.log(
         `Example app listening on port http://localhost:${envVars.PORT}`

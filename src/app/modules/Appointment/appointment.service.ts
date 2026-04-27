@@ -8,6 +8,9 @@ import { IBookAppointmentPayload } from "./appointment.interface";
 import { AppointmentStatus, PaymentStatus, Role } from "../../../generated/prisma";
 import { stripe } from "../../config/stripe";
 
+
+
+
 // Pay Now Book Appointment
 const bookAppointment = async (payload: IBookAppointmentPayload, user: IRequestUser) => {
     const patientData = await prisma.patient.findUniqueOrThrow({
@@ -84,7 +87,7 @@ const bookAppointment = async (payload: IBookAppointmentPayload, user: IRequestU
                         product_data: {
                             name: `Appointment with Dr. ${doctorData.name}`,
                         },
-                        unit_amount: doctorData.appointMentFee * 120,
+                        unit_amount: doctorData.appointMentFee * 100,
                     },
                     quantity: 1,
                 }
@@ -107,12 +110,14 @@ const bookAppointment = async (payload: IBookAppointmentPayload, user: IRequestU
         };
     });
 
-    // return {
-    //     appointment : result.appointMentData,
-    //     payment : result.paymentData,
-    //     paymentUrl : result.paymentUrl,
-    // };
+    return {
+        appointment: result.appointmentData,
+        payment: result.paymentData,
+        paymentUrl: result.paymentUrl,
+    };
 }
+
+
 
 const getMyAppointments = async (user: IRequestUser) => {
     //user can be patient or doctor, so we need to check both

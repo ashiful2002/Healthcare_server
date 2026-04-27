@@ -8,16 +8,13 @@ import { Role } from "../../../generated/prisma";
 const router = express.Router();
 
 router.get("/", AdminController.getAllAdmins);
-
 router.get("/:id", AdminController.getAdminById);
-
 router.patch(
   "/:id",
   validateRequest(AdminValidation.updateAdminValidation),
   checkAuth(Role.SUPER_ADMIN),
   AdminController.updateAdmin
 );
-
 router.delete("/:id", checkAuth(Role.SUPER_ADMIN), AdminController.deleteAdmin);
 
 export const AdminRoutes = router;

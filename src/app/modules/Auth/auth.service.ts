@@ -1,5 +1,6 @@
 import status from "http-status";
 import { JwtPayload } from "jsonwebtoken";
+
 import { envVars } from "../../config/env";
 import AppError from "../../errorHelpers/AppError";
 import { IRequestUser } from "../../interfaces/requestUser.interface";
@@ -29,7 +30,6 @@ const registerPatient = async (payload: IRegisterPatientPayload) => {
   });
 
   if (!data.user) {
-    // throw new Error("Failed to register patient");
     throw new AppError(status.BAD_REQUEST, "Failed to register patient");
   }
 
@@ -86,7 +86,6 @@ const registerPatient = async (payload: IRegisterPatientPayload) => {
 
 const loginUser = async (payload: ILoginUserPayload) => {
   const { email, password } = payload;
-  console.log("payload", payload);
 
   const data = await auth.api.signInEmail({
     body: {
