@@ -276,8 +276,6 @@ const getAllAppointments = async () => {
     return appointments;
 }
 
-
-
 // Pay Later Book Appointment
 const bookAppointmentWithPayLater = async (payload: IBookAppointmentPayload, user: IRequestUser) => {
     const patientData = await prisma.patient.findUniqueOrThrow({
