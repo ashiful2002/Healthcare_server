@@ -1,3 +1,10 @@
-export type TReview = {
-    // Add interface properties here
-    };
+export interface ICreateReviewPayload {
+    appointmentId: string;
+    rating: number;
+    comment: string;
+}
+
+export interface IUpdateReviewPayload {
+    rating: number;
+    comment: string;
+}
