@@ -1,6 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import status from "http-status";
- import { deleteFileFromCloudinary, uploadFileToCloudinary } from "../../config/cloudinary.config";
+import { deleteFileFromCloudinary, uploadFileToCloudinary } from "../../config/cloudinary.config";
 import AppError from "../../errorHelpers/AppError";
 import { IRequestUser } from "../../interfaces/requestUser.interface";
 import { prisma } from "../../lib/prisma";
@@ -8,7 +7,7 @@ import { sendEmail } from "../../utils/email";
 import { ICreatePrescriptionPayload } from "./prescription.interface";
 import { generatePrescriptionPDF } from "./prescription.utils";
 import { Role } from "../../../generated/prisma";
- 
+
 const givePrescription = async (user: IRequestUser, payload: ICreatePrescriptionPayload) => {
     const doctorData = await prisma.doctor.findUniqueOrThrow({
         where: {
@@ -35,6 +34,7 @@ const givePrescription = async (user: IRequestUser, payload: ICreatePrescription
         }
     });
 
+    
     if (appointmentData.doctorId !== doctorData.id) {
         throw new AppError(status.BAD_REQUEST, "You can only give prescription for your own appointments");
     }

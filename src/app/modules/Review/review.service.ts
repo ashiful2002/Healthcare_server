@@ -5,7 +5,8 @@ import { prisma } from "../../lib/prisma";
 import { ICreateReviewPayload, IUpdateReviewPayload } from "./review.interface";
 import { PaymentStatus, Role } from "../../../generated/prisma";
 
-const giveReview = async (user : IRequestUser, payload : ICreateReviewPayload) => {
+const giveReview = async (user : IRequestUser, payload: ICreateReviewPayload) => {
+
    const patientData = await prisma.patient.findUniqueOrThrow({
     where: {
         email : user.email
@@ -68,8 +69,7 @@ const giveReview = async (user : IRequestUser, payload : ICreateReviewPayload) =
     return result;
 };
 
-const getAllReviews = async (
-) => {
+const getAllReviews = async () => {
     const reviews = await prisma.review.findMany({
         include: {
             doctor: true,
